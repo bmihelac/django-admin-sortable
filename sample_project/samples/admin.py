@@ -10,7 +10,33 @@ from .models import (Category, Widget, Project, Credit, Note, GenericNote,
     CustomWidget, CustomWidgetComponent, BackwardCompatibleWidget)
 
 
-admin.site.register(Category, SortableAdmin)
+class DecadeBornListFilter(admin.SimpleListFilter):
+    # dummy filter
+    # https://docs.djangoproject.com/en/5.0/ref/contrib/admin/filters/#using-a-simplelistfilter
+    title = 'decade born'
+    parameter_name = 'decade'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('80s', 'in the eighties'),
+            ('90s', 'in the nineties'),
+        )
+
+    def queryset(self, request, queryset):
+        return queryset
+
+
+class CategoryAdmin(SortableAdmin):
+    list_filter = (DecadeBornListFilter,)
+
+    # workaround
+    # def get_querystring_filters(self, request):
+        # filters = super().get_querystring_filters(request)
+        # filters.pop("decade", None)
+        # return filters
+
+
+admin.site.register(Category, CategoryAdmin)
 
 
 class ComponentInline(SortableStackedInline):
